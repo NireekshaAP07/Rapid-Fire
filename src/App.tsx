@@ -285,13 +285,7 @@ function App() {
           <Plus size={15} /> New benchmark
         </button>
       )}
-      <div className="notice">
-        {backendConnected ? (
-          <span>🟢 Connected to live FastAPI backend at <code>http://localhost:8000</code>. Real agents and benchmark results are synced.</span>
-        ) : (
-          <span>This workspace uses illustrative benchmark results. Connect to your FastAPI backend to enable live data.</span>
-        )}
-      </div>
+      <div className="notice">This workspace uses illustrative benchmark results. Your own agents are saved separately in a Canva Sheet.</div>
       <div className="grid stats">
         {renderStat('Total agents', String(agents.length).padStart(2, '0'), <Bot size={18} />, `${agents.length} agents registered`)}
         {renderStat('Experiments', summary ? String(summary.total_runs) : '128', <FlaskConical size={18} />, summary ? `${summary.passed} passed` : '↑ 12.4% vs last month')}
@@ -412,13 +406,7 @@ function App() {
           <Plus size={15} /> Add agent
         </button>
       )}
-      <div className="notice">
-        {backendConnected ? (
-          <span>🟢 Real-time agent roster connected to PostgreSQL/SQLite via FastAPI. Click &quot;Add agent&quot; to register a new agent in the database.</span>
-        ) : (
-          <span>Four example agents illustrate the platform. Connect backend for persistent agent profiles.</span>
-        )}
-      </div>
+      <div className="notice">Four example agents illustrate the platform. Add your own agent profile to save it in a Canva Sheet. “Test connection” is a simulated UI check, not a live API test.</div>
       <div className="grid agent-grid">
         {agents.map((agent) => (
           <article className="card agent-card" key={agent.name}>
@@ -622,7 +610,7 @@ function App() {
         <section className="card canva-card">
           <div className="card-head">
             <h2>Configure a run</h2>
-            <span className="pill">{backendConnected ? 'FastAPI Connected' : 'Demo simulation'}</span>
+            <span className="pill">Demo simulation</span>
           </div>
           <div className="formgrid">
             <div className="field">
@@ -738,7 +726,7 @@ function App() {
     <>
       {heading('Tavily Search', 'Explore a research workflow and turn a result into a benchmark task.', '')}
       <div className="search-hero">
-        <div className="eyebrow">Search workspace · {backendConnected ? 'API Ready' : 'sample mode'}</div>
+        <div className="eyebrow">Search workspace · sample mode</div>
         <h2>Find context, then test with it.</h2>
         <p className="sub">Search and explore reference contexts. Configure TAVILY_API_KEY in backend/.env for live queries.</p>
         <div className="row" style={{ marginTop: 20 }}>
@@ -1080,7 +1068,7 @@ function App() {
         </div>
         <section className="card canva-card">
           <div className="card-head">
-            <h2>Report history {backendConnected && <span className="pill">Live from DB</span>}</h2>
+            <h2>Report history</h2>
           </div>
           {filtered.length ? (
             <div className="table-wrap">
@@ -1149,7 +1137,7 @@ function App() {
         </div>
         <section className="card canva-card">
           <div className="card-head">
-            <h2>Agent rankings {backendConnected && <span className="pill">Live SQLite Rankings</span>}</h2>
+            <h2>Agent rankings</h2>
           </div>
           <div className="table-wrap">
             <table className="table">
@@ -1205,7 +1193,7 @@ function App() {
           </div>
         </section>
         <p className="mini" style={{ marginTop: 14 }}>
-          {backendConnected ? 'Data dynamically queried from your FastAPI backend.' : 'Run backend server to connect live rankings.'}
+          User-added agents receive placeholder sample metrics until a real evaluation service is connected.
         </p>
       </>
     );
@@ -1344,7 +1332,7 @@ function App() {
       {heading('Alerts', 'Keep important changes visible without the noise.')}
       <section className="card canva-card">
         <div className="card-head">
-          <h2>{backendConnected ? 'Live alerts from backend' : 'Recent sample alerts'}</h2>
+          <h2>Recent sample alerts</h2>
         </div>
         <div className="list">
           {alertsList.length > 0 ? (
@@ -1407,28 +1395,25 @@ function App() {
 
   const settingsView = () => (
     <>
-      {heading('Settings', 'Workspace configuration and service connections.')}
+      {heading('Settings', 'A few thoughtful controls for your demonstration workspace.')}
       <div className="split">
         <div>
           <section className="card canva-card">
             <div className="card-head">
-              <h2>Backend status</h2>
+              <h2>Profile</h2>
             </div>
             <div className="settings-row">
               <div>
-                <strong>FastAPI Server</strong>
-                <p>http://localhost:8000</p>
+                <strong>Workspace name</strong>
+                <p>RapidFire Demo</p>
               </div>
-              <span className={`badge ${backendConnected ? '' : 'orange'}`}>
-                {backendConnected ? '🟢 Connected' : '🔴 Offline'}
-              </span>
+              <span className="badge purple">Public demo</span>
             </div>
             <div className="settings-row">
               <div>
-                <strong>Database</strong>
-                <p>SQLAlchemy + SQLite / PostgreSQL</p>
+                <strong>Data</strong>
+                <p>Agent profiles you add are saved in a Canva Sheet.</p>
               </div>
-              <span className="badge purple">{backendConnected ? 'Active' : 'Standby'}</span>
             </div>
           </section>
           <div style={{ height: 17 }} />
@@ -1438,40 +1423,39 @@ function App() {
             </div>
             <div className="settings-row">
               <div>
-                <strong>Bifrost LLM Gateway</strong>
-                <p>Route model queries through Bifrost</p>
+                <strong>Bifrost</strong>
+                <p>Not connected in this demonstration.</p>
               </div>
-              <span className="badge orange">Configurable in .env</span>
+              <span className="badge orange">Demo only</span>
             </div>
             <div className="settings-row">
               <div>
-                <strong>Tavily Search</strong>
-                <p>Web research and context retrieval</p>
+                <strong>Tavily</strong>
+                <p>Search uses a local sample result set.</p>
               </div>
-              <span className="badge purple">Supported</span>
+              <span className="badge purple">Sample mode</span>
             </div>
+            <p className="mini">Secure service integrations must be configured outside this sandbox. Do not enter credentials here.</p>
           </section>
         </div>
         <div>
           <section className="card canva-card">
             <div className="card-head">
-              <h2>Workspace</h2>
+              <h2>Security</h2>
             </div>
             <div className="settings-row">
               <div>
-                <strong>Workspace name</strong>
-                <p>RapidFire MVP</p>
+                <strong>Authentication</strong>
+                <p>This public demo does not include sign-in or account access.</p>
               </div>
-              <span className="badge purple">Hackathon MVP</span>
+              <span className="badge orange">Unavailable</span>
             </div>
             <div className="settings-row">
               <div>
-                <strong>API Docs (Swagger)</strong>
-                <p>Explore all REST endpoints</p>
+                <strong>External navigation</strong>
+                <p>Source links open in a new tab.</p>
               </div>
-              <a href="http://localhost:8000/docs" target="_blank" rel="noreferrer" className="btn soft" style={{ textDecoration: 'none' }}>
-                Open Swagger ↗
-              </a>
+              <span className="badge">Enabled</span>
             </div>
           </section>
           <div style={{ height: 17 }} />
@@ -1482,9 +1466,16 @@ function App() {
             <div className="settings-row">
               <div>
                 <strong>In-app alerts</strong>
-                <p>Display live alerts from the database.</p>
+                <p>Display sample alert indicators.</p>
               </div>
               <input className="toggle" type="checkbox" defaultChecked />
+            </div>
+            <div className="settings-row">
+              <div>
+                <strong>Weekly summary</strong>
+                <p>Visual preference only; no email is sent.</p>
+              </div>
+              <input className="toggle" type="checkbox" />
             </div>
           </section>
         </div>
@@ -1577,8 +1568,8 @@ function App() {
           <div className="profile">
             <div className="avatar">RF</div>
             <div>
-              <strong>RapidFire Team</strong>
-              <small>{backendConnected ? 'FastAPI Connected' : 'Offline Mode'}</small>
+              <strong>Demo workspace</strong>
+              <small>Sample environment</small>
             </div>
           </div>
           <button
@@ -1586,12 +1577,12 @@ function App() {
             className="side-action"
             onClick={() =>
               setModal({
-                title: 'RapidFire Hackathon MVP',
-                content: 'Full stack AI Agent Benchmarking platform powered by React + TypeScript (frontend) and FastAPI + SQLAlchemy + SQLite/PostgreSQL (backend).',
+                title: 'About this demo',
+                content: 'RapidFire is a public interactive demonstration. Its benchmark results, reports, search results, and connection checks are illustrative. No sign-in or live AI service is connected.',
               })
             }
           >
-            <LogOut size={15} /> About platform
+            <LogOut size={15} /> About this demo
           </button>
         </div>
       </aside>
@@ -1607,13 +1598,6 @@ function App() {
             </span>
           </div>
           <div className="top-actions">
-            {backendConnected ? (
-              <span className="demo-pill" style={{ background: '#e6f4ea', color: '#137333', borderColor: '#ceead6', fontWeight: 600 }}>
-                ● FastAPI Live (Port 8000)
-              </span>
-            ) : (
-              <span className="demo-pill">✦ Offline (Demo mode)</span>
-            )}
             <button type="button" aria-label="View alerts" onClick={() => setPage('Alerts')}>
               <Bell size={18} />
             </button>
