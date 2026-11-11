@@ -10,7 +10,8 @@ from app.core.config import settings
 router = APIRouter()
 
 
-@router.post("/", response_model=SearchResponse)
+@router.post("", response_model=SearchResponse)
+@router.post("/", response_model=SearchResponse, include_in_schema=False)
 async def search(payload: SearchRequest):
     if not settings.TAVILY_API_KEY:
         raise HTTPException(status_code=503, detail="TAVILY_API_KEY is not configured")
