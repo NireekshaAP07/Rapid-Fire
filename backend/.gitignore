@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+.env
+rapidfire.db
+*.sqlite
+*.sqlite3
