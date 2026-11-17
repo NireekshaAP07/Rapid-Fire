@@ -152,13 +152,16 @@ export const api = {
   },
 
   // Tavily Search
-  searchTavily: async (query: string, maxResults = 3) => {
+  searchTavily: async (query: string, maxResults = 3, searchDepth = 'basic') => {
     const res = await fetch(`${API_BASE}/search/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, max_results: maxResults }),
+      body: JSON.stringify({ query, max_results: maxResults, search_depth: searchDepth }),
     });
-    if (!res.ok) throw new Error('Tavily search failed');
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Tavily search failed' }));
+      throw new Error(err.detail || `Search failed with status ${res.status}`);
+    }
     return res.json();
   },
 };

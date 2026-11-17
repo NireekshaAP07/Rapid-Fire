@@ -10,14 +10,16 @@ from app.core.config import settings
 router = APIRouter()
 
 
-@router.post("/", response_model=SearchResponse)
+@router.post("", response_model=SearchResponse)
+@router.post("/", response_model=SearchResponse, include_in_schema=False)
 async def search(payload: SearchRequest):
-    if not settings.TAVILY_API_KEY:
-        raise HTTPException(status_code=503, detail="TAVILY_API_KEY is not configured")
+    api_key = settings.get_tavily_key()
+    if not api_key:
+        raise HTTPException(status_code=503, detail="TAVILY_API_KEY is not configured in backend/.env")
 
     try:
         from tavily import TavilyClient
-        client = TavilyClient(api_key=settings.TAVILY_API_KEY)
+        client = TavilyClient(api_key=api_key)
         response = client.search(
             query=payload.query,
             search_depth=payload.search_depth,

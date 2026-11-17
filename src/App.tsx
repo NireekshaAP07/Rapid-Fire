@@ -142,6 +142,41 @@ function App() {
   const [leaderboardList, setLeaderboardList] = useState<LeaderboardAgent[]>([]);
   const [isAddAgentOpen, setIsAddAgentOpen] = useState(false);
   const [newAgent, setNewAgent] = useState({ name: '', framework: 'LangChain', model: 'GPT-4o', description: '' });
+  const [sourcesList, setSourcesList] = useState(initialSources);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('AI agents');
+  const [searchResultCount, setSearchResultCount] = useState<number>(3);
+  const [searchDepth, setSearchDepth] = useState<string>('basic');
+
+  const handleTavilySearch = async (queryText?: string) => {
+    const q = (queryText || searchQuery).trim();
+    if (!q) return;
+
+    setSearchHistory((prev) => [q, ...prev.filter((item) => item !== q)].slice(0, 5));
+    setIsSearching(true);
+
+    try {
+      const data = await api.searchTavily(q, searchResultCount, searchDepth);
+      if (data && data.results && data.results.length > 0) {
+        const formatted = data.results.map((r: { title: string; url: string; content: string; score?: number }) => ({
+          title: r.title || 'Untitled Result',
+          url: r.url,
+          summary: r.content || 'No summary available.',
+          score: r.score ? Math.round(r.score * 100) : 92,
+          topic: 'Live Web',
+          date: new Date().toISOString().split('T')[0],
+        }));
+        setSourcesList(formatted);
+      } else {
+        alert(`Tavily found 0 results for "${q}".`);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      alert(`Tavily Search: ${msg}\n\nTip: Ensure both the backend (http://127.0.0.1:8000) and frontend are running.`);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const loadBackendData = async () => {
     try {
@@ -726,34 +761,39 @@ function App() {
     <>
       {heading('Tavily Search', 'Explore a research workflow and turn a result into a benchmark task.', '')}
       <div className="search-hero">
-        <div className="eyebrow">Search workspace · sample mode</div>
+        <div className="eyebrow">Search workspace · {sourcesList !== initialSources ? 'Live results' : 'sample mode'}</div>
         <h2>Find context, then test with it.</h2>
-        <p className="sub">Search and explore reference contexts. Configure TAVILY_API_KEY in backend/.env for live queries.</p>
+        <p className="sub">Search the live web using Tavily or explore reference contexts for benchmark prompts.</p>
         <div className="row" style={{ marginTop: 20 }}>
-          <input id="search-query" className="input" placeholder="Search sample results..." defaultValue="AI agents" style={{ flex: 1, minWidth: 210 }} />
+          <input
+            id="search-query"
+            className="input"
+            placeholder="Search web or topics..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleTavilySearch()}
+            style={{ flex: 1, minWidth: 210 }}
+          />
           <button
             className="btn primary"
             type="button"
-            onClick={() =>
-              setSearchHistory((prev) => {
-                const value = (document.getElementById('search-query') as HTMLInputElement | null)?.value.trim();
-                return value ? [value, ...prev].slice(0, 5) : prev;
-              })
-            }
+            disabled={isSearching}
+            onClick={() => handleTavilySearch()}
           >
-            <Search size={15} /> Search
+            <Search size={15} /> {isSearching ? 'Searching...' : 'Search'}
           </button>
         </div>
       </div>
       <div className="toolbar">
-        <select className="select">
-          <option>Basic depth</option>
-          <option>Advanced depth</option>
+        <select className="select" value={searchDepth} onChange={(e) => setSearchDepth(e.target.value)}>
+          <option value="basic">Basic depth</option>
+          <option value="advanced">Advanced depth</option>
         </select>
-        <select className="select">
-          <option>3 results</option>
-          <option>2 results</option>
-          <option>1 result</option>
+        <select className="select" value={searchResultCount} onChange={(e) => setSearchResultCount(Number(e.target.value))}>
+          <option value={3}>3 results</option>
+          <option value={2}>2 results</option>
+          <option value={1}>1 result</option>
+          <option value={5}>5 results</option>
         </select>
         <select className="select">
           <option>All topics</option>
@@ -769,7 +809,7 @@ function App() {
       </div>
       <div className="split">
         <div>
-          {initialSources.map((item) => (
+          {sourcesList.map((item) => (
             <article className="result-card" key={item.url}>
               <div className="row" style={{ justifyContent: 'space-between' }}>
                 <span className="badge purple">{item.topic}</span>
@@ -803,17 +843,22 @@ function App() {
           <div className="list">
             {searchHistory.length ? (
               searchHistory.map((term) => (
-                <div className="list-item" key={term}>
+                <div
+                  className="list-item"
+                  key={term}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setSearchQuery(term);
+                    handleTavilySearch(term);
+                  }}
+                >
                   <span>{term}</span>
-                  <span className="mini">This session</span>
+                  <span className="mini">Search again ↗</span>
                 </div>
               ))
             ) : (
               <p className="sub">Your searches in this view will appear here.</p>
             )}
-          </div>
-          <div className="notice" style={{ marginTop: 18 }}>
-            Set <code>TAVILY_API_KEY</code> in <code>backend/.env</code> to unlock live web searches.
           </div>
         </section>
       </div>

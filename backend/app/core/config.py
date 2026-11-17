@@ -1,5 +1,10 @@
 from pydantic_settings import BaseSettings
 from typing import List
+from pathlib import Path
+from dotenv import dotenv_values
+import os
+
+ENV_PATH = Path(__file__).resolve().parent.parent.parent / ".env"
 
 
 class Settings(BaseSettings):
@@ -16,8 +21,16 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
 
     class Config:
-        env_file = ".env"
+        env_file = str(ENV_PATH)
         env_file_encoding = "utf-8"
+
+    def get_tavily_key(self) -> str:
+        if ENV_PATH.exists():
+            vals = dotenv_values(ENV_PATH)
+            key = vals.get("TAVILY_API_KEY")
+            if key and key.strip() and key.strip() != "your_actual_tavily_key_here":
+                return key.strip()
+        return self.TAVILY_API_KEY or os.getenv("TAVILY_API_KEY", "")
 
 
 settings = Settings()
