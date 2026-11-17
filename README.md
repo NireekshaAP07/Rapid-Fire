@@ -15,6 +15,7 @@ RapidFire is a full-stack platform designed to benchmark, compare, and diagnose 
 - 🌐 **Live Web Search (Tavily)**: Integrated real-time web research to convert live internet findings into benchmark test prompts.
 - 🔬 **Execution Trace Viewer**: Inspect granular step-by-step traces (Task Input → Model Request → Tool Calls → Retries → Rubric Evaluation).
 - ⚠️ **Failure Diagnosis & AI Insights**: Analyze failure distributions and measure automated self-recovery rates.
+- 🆚 **Side-by-Side Agent Comparison**: Select 2-3 agents and compare accuracy, latency, success rate, error rate, and cost in one view, with the best value in each metric highlighted and a radar chart for quick visual analysis.
 
 ---
 
