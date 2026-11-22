@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import Optional, List
+from pydantic import BaseModel, Field, field_validator
+from typing import Optional, List, Literal
 from datetime import datetime
 
 
@@ -162,9 +162,17 @@ class LeaderboardEntry(BaseModel):
 
 # ── Search Schemas ────────────────────────────────────────────
 class SearchRequest(BaseModel):
-    query: str
-    max_results: Optional[int] = 3
-    search_depth: Optional[str] = "basic"   # basic | advanced
+    query: str = Field(min_length=1, max_length=400)
+    max_results: int = Field(default=3, ge=1, le=20)
+    search_depth: Literal["basic", "advanced"] = "basic"
+
+    @field_validator("query")
+    @classmethod
+    def strip_query(cls, value: str) -> str:
+        query = value.strip()
+        if not query:
+            raise ValueError("Query must not be blank")
+        return query
 
 
 class SearchResult(BaseModel):

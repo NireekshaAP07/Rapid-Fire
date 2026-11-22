@@ -116,12 +116,14 @@ Open `backend/.env` in your code editor and configure your keys:
 DATABASE_URL=sqlite:///./rapidfire.db
 
 # Tavily Search API Key (for live web search)
-TAVILY_API_KEY=tvly-your_actual_key_here
+TAVILY_API_KEY=your_tavily_api_key_here
 
 # Bifrost LLM Gateway (Optional)
 BIFROST_BASE_URL=http://localhost:8080
 BIFROST_API_KEY=
 ```
+
+Replace the Tavily placeholder with your own API key. Keep it in the ignored `backend/.env` file, never in source control, and restart the backend after changing it.
 
 ---
 

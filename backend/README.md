@@ -34,7 +34,8 @@ pip install -r requirements.txt
 ### 4. Configure environment
 ```bash
 cp .env.example .env
-# Then edit .env with your DB credentials and API keys
+# Set TAVILY_API_KEY in .env to your own key for live search.
+# Do not commit .env; restart the backend after changing the key.
 ```
 
 ### 5. Run database migrations

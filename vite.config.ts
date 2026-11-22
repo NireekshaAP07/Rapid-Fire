@@ -10,7 +10,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     host: '0.0.0.0',
-    port: 4173,
+    port: 5173,
     fs: {
       allow: [__dirname, '/home/nireeksha-a-p/Rapid-Fire:globalai', '/home/nireeksha-a-p/Rapid-Fire:globalai/Rapid-Fire'],
     },
