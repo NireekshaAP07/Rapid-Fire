@@ -93,4 +93,4 @@ for a in alerts_data:
 
 db.commit()
 db.close()
-print("✅ Database seeded successfully!")
+print("Database seeded successfully!")

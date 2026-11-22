@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -144,6 +144,7 @@ function App() {
   const [newAgent, setNewAgent] = useState({ name: '', framework: 'LangChain', model: 'GPT-4o', description: '' });
   const [sourcesList, setSourcesList] = useState(initialSources);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('AI agents');
   const [searchResultCount, setSearchResultCount] = useState<number>(3);
   const [searchDepth, setSearchDepth] = useState<string>('basic');
@@ -153,6 +154,7 @@ function App() {
     if (!q) return;
 
     setSearchHistory((prev) => [q, ...prev.filter((item) => item !== q)].slice(0, 5));
+    setSearchError(null);
     setIsSearching(true);
 
     try {
@@ -162,7 +164,7 @@ function App() {
           title: r.title || 'Untitled Result',
           url: r.url,
           summary: r.content || 'No summary available.',
-          score: r.score ? Math.round(r.score * 100) : 92,
+          score: typeof r.score === 'number' ? Math.round(r.score * 100) : 92,
           topic: 'Live Web',
           date: new Date().toISOString().split('T')[0],
         }));
@@ -172,13 +174,13 @@ function App() {
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      alert(`Tavily Search: ${msg}\n\nTip: Ensure both the backend (http://127.0.0.1:8000) and frontend are running.`);
+      setSearchError(msg);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const loadBackendData = async () => {
+  const loadBackendData = useCallback(async () => {
     try {
       const health = await api.checkHealth();
       if (health && health.status === 'ok') {
@@ -225,11 +227,15 @@ function App() {
     } catch {
       setBackendConnected(false);
     }
-  };
+  }, [sortMetric]);
 
   useEffect(() => {
-    loadBackendData();
-  }, []);
+    const initialLoad = window.setTimeout(() => {
+      void loadBackendData();
+    }, 0);
+
+    return () => window.clearTimeout(initialLoad);
+  }, [loadBackendData]);
 
   useEffect(() => {
     if (backendConnected) {
@@ -783,6 +789,7 @@ function App() {
             <Search size={15} /> {isSearching ? 'Searching...' : 'Search'}
           </button>
         </div>
+        {searchError && <p className="notice" role="alert">{searchError}</p>}
       </div>
       <div className="toolbar">
         <select className="select" value={searchDepth} onChange={(e) => setSearchDepth(e.target.value)}>
@@ -1613,8 +1620,8 @@ function App() {
           <div className="profile">
             <div className="avatar">RF</div>
             <div>
-              <strong>Demo workspace</strong>
-              <small>Sample environment</small>
+              <strong>RapidFire</strong>
+              <small> </small>
             </div>
           </div>
           <button
@@ -1622,12 +1629,12 @@ function App() {
             className="side-action"
             onClick={() =>
               setModal({
-                title: 'About this demo',
+                title: 'About RapidFire',
                 content: 'RapidFire is a public interactive demonstration. Its benchmark results, reports, search results, and connection checks are illustrative. No sign-in or live AI service is connected.',
               })
             }
           >
-            <LogOut size={15} /> About this demo
+            <LogOut size={15} /> About RapidFire
           </button>
         </div>
       </aside>
